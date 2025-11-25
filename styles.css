@@ -74,6 +74,11 @@ select {
   flex: 1;
   min-width: 0;
 }
+/* Prevent buttons inside .controls from shrinking too small on narrow screens */
+.controls > button {
+  flex: 0 0 auto;
+  min-width: 84px;
+}
 .small {
   flex: 0 0 120px;
 }
@@ -96,7 +101,7 @@ button.secondary {
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.06);
   flex: 0 0 auto;
-  margin-left: 8px;
+  /* margin-left: 8px; */
   align-self: center;
   transition:
     transform 150ms ease,
