@@ -22,36 +22,44 @@
 
       <div class="card">
         <div class="controls">
-          <input
-            id="target"
-            type="text"
-            value="https://www.google.com/generate_204"
-            aria-label="target URL"
-          />
-          <input
-            id="interval"
-            type="number"
-            class="small"
-            value="2000"
-            min="200"
-            aria-label="interval ms"
-          />
-          <input
-            id="timeout"
-            type="number"
-            class="small"
-            value="3000"
-            min="100"
-            aria-label="timeout ms"
-          />
-          <button id="start">Start</button>
-          <button id="clear" class="secondary">Clear</button>
-          <div
-            id="activity"
-            class="activity"
-            aria-hidden="true"
-            title="Ping activity"
-          ></div>
+          <div class="group group-target">
+            <input
+              id="target"
+              type="text"
+              value="https://www.google.com/generate_204"
+              aria-label="target URL"
+            />
+          </div>
+
+          <div class="group group-interval">
+            <input
+              id="interval"
+              type="number"
+              class="small"
+              value="2000"
+              min="200"
+              aria-label="interval ms"
+            />
+            <input
+              id="timeout"
+              type="number"
+              class="small"
+              value="3000"
+              min="100"
+              aria-label="timeout ms"
+            />
+          </div>
+
+          <div class="group group-actions">
+            <button id="start">Start</button>
+            <button id="clear" class="secondary">Clear</button>
+            <div
+              id="activity"
+              class="activity"
+              aria-hidden="true"
+              title="Ping activity"
+            ></div>
+          </div>
         </div>
         <div class="stats" style="margin-top: 10px">
           <div class="stat">

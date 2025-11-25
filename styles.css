@@ -70,17 +70,43 @@ select {
   width: 100%;
   min-width: 140px;
 }
-.controls > * {
-  flex: 1;
+/* Top-level children of .controls are now .group wrappers */
+.controls > .group {
+  flex: 0 0 auto;
   min-width: 0;
 }
+
+/* Keep elements inside a group together on a single row */
+.group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+/* Target group should expand to take remaining space */
+.group-target {
+  flex: 1 1 320px;
+  min-width: 160px;
+}
+.group-interval {
+  flex: 0 0 auto;
+}
+.group-actions {
+  flex: 0 0 auto;
+}
 /* Prevent buttons inside .controls from shrinking too small on narrow screens */
-.controls > button {
+.controls .group > button {
   flex: 0 0 auto;
   min-width: 84px;
 }
 .small {
   flex: 0 0 120px;
+}
+/* Ensure small inputs inside groups don't stretch full width */
+.group .small {
+  width: auto;
+  box-sizing: border-box;
 }
 button {
   background: var(--accent);
@@ -182,8 +208,9 @@ footer {
   .controls {
     flex-direction: column;
   }
-  .small {
-    flex: 1;
+  /* Keep interval/timeout side-by-side inside their group on narrow screens */
+  .group-interval {
+    flex-wrap: nowrap;
   }
   /* Allow inputs and selects to shrink on small screens to avoid horizontal overflow */
   .controls > * {
