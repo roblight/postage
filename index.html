@@ -13,6 +13,12 @@
       href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
     />
     <style>
+      /* Ensure any Leaflet attribution control is hidden if present */
+      .leaflet-control-attribution {
+        display: none !important;
+      }
+    </style>
+    <style>
       :root {
         --bg: #0f1720;
         --card: #0b1220;
@@ -651,12 +657,25 @@
         const mapEl = document.getElementById("map");
         if (!mapEl) return;
 
-        const map = L.map("map", { zoomControl: true }).setView([0, 0], 2);
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          maxZoom: 19,
-          attribution:
-            '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
-        }).addTo(map);
+        // Disable visible attribution control on the map and clear tile attribution
+        const map = L.map("map", {
+          zoomControl: true,
+          attributionControl: false,
+        }).setView([0, 0], 2);
+        const tiles = L.tileLayer(
+          "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          {
+            maxZoom: 19,
+            attribution: "",
+            attributionControl: false,
+          }
+        ).addTo(map);
+
+        // Extra safeguard: remove any residual attribution DOM nodes that Leaflet might add
+        setTimeout(() => {
+          const els = document.querySelectorAll(".leaflet-control-attribution");
+          els.forEach((el) => el.remove());
+        }, 50);
 
         const trackLayer = L.layerGroup().addTo(map);
         let lastPos = null;
