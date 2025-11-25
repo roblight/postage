@@ -72,6 +72,7 @@ select {
 }
 .controls > * {
   flex: 1;
+  min-width: 0;
 }
 .small {
   flex: 0 0 120px;
@@ -178,5 +179,16 @@ footer {
   }
   .small {
     flex: 1;
+  }
+  /* Allow inputs and selects to shrink on small screens to avoid horizontal overflow */
+  .controls > * {
+    min-width: 0;
+  }
+  input[type="text"],
+  input[type="number"],
+  select {
+    min-width: 0;
+    width: 100%;
+    box-sizing: border-box;
   }
 }
