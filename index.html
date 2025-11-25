@@ -198,10 +198,6 @@
             <div class="label">Errors</div>
             <div id="errors" class="value">0</div>
           </div>
-          <div class="stat">
-            <div class="label">Samples</div>
-            <div id="samples" class="value">0</div>
-          </div>
         </div>
       </div>
 
@@ -231,7 +227,6 @@
       const lossEl = document.getElementById("loss");
       const timeoutsEl = document.getElementById("timeouts");
       const errorsEl = document.getElementById("errors");
-      const samplesEl = document.getElementById("samples");
       const connectionEl = document.getElementById("connection");
       const canvas = document.getElementById("chart");
       const ctx = canvas.getContext("2d");
@@ -394,7 +389,6 @@
         const timeouts = history.filter((v) => v === "timeout").length;
         const errors = history.filter((v) => v === "error").length;
 
-        samplesEl.textContent = `${attempts}`;
         lastEl.textContent = successes.length
           ? `${Math.round(successes[successes.length - 1])} ms`
           : "— ms";
