@@ -175,6 +175,12 @@
         text-align: center;
         padding: 8px;
       }
+      /* Smaller, muted connection/status text */
+      #connection {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1;
+      }
       @media (max-width: 520px) {
         .controls {
           flex-direction: column;
@@ -265,7 +271,7 @@
         <div
           style="display: flex; justify-content: space-between; margin-top: 8px"
         >
-          <div id="connection">Connection: 🤷</div>
+          <div id="connection">🌐 &nbsp;</div>
         </div>
       </div>
       <div class="card">
@@ -393,24 +399,23 @@
 
       // Update the connection UI with effectiveType/downlink + local/public info.
       async function updateConnectionInfo() {
-        const nav = navigator;
-        const conn =
-          nav.connection || nav.mozConnection || nav.webkitConnection;
         const parts = [];
-        if (conn && conn.effectiveType) {
-          const downlink = Number.isFinite(conn.downlink)
-            ? conn.downlink.toFixed(1)
-            : "—";
-          parts.push(`Connection: ${conn.effectiveType} (${downlink} Mbps)`);
-        } else {
-          parts.push(`Connection: 🤷`);
-        }
+        // const nav = navigator;
+        // const conn =
+        //   nav.connection || nav.mozConnection || nav.webkitConnection;
+        // if (conn && conn.effectiveType) {
+        //   const downlink = Number.isFinite(conn.downlink)
+        //     ? conn.downlink.toFixed(1)
+        //     : "—";
+        //   parts.push(`Connection: ${conn.effectiveType} (${downlink} Mbps)`);
+        // } else {
+        //   parts.push(`Connection: 🤷`);
+        // }
 
         // Add local IPs (best-effort; may be empty or suppressed by the browser)
         try {
           const local = await getLocalIPs();
-          if (local && local.length)
-            parts.push(`Local IPs: ${local.join(", ")}`);
+          if (local && local.length) parts.push(local.join(", "));
         } catch (e) {}
 
         // Try public IP + reverse DNS (best-effort)
@@ -423,7 +428,7 @@
           }
         } catch (e) {}
 
-        connectionEl.textContent = parts.join(" • ");
+        connectionEl.textContent += parts.join(" • ");
       }
 
       // Ping using fetch + AbortController for reliable timing and timeouts.
