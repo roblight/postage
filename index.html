@@ -8,6 +8,10 @@
     <meta name="theme-color" content="#071025" />
     <link rel="icon" type="image/png" href="/icons/icon-192.png" />
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
     <style>
       :root {
         --bg: #0f1720;
@@ -258,6 +262,9 @@
           <div id="connection">Connection: 🤷</div>
         </div>
       </div>
+      <div class="card">
+        <div id="map" style="height: 240px; border-radius: 8px"></div>
+      </div>
     </div>
 
     <script>
@@ -283,8 +290,14 @@
       // Activity indicator element and helper
       const activityEl = document.getElementById("activity");
       let _activityTimer = null;
+      // lastActivityState is used by the map track to color segments
+      let lastActivityState = null;
+      let lastActivityTimestamp = null;
       function setActivity(state) {
         if (!activityEl) return;
+        // record last state and timestamp for mapping
+        lastActivityState = state || null;
+        if (state) lastActivityTimestamp = Date.now();
         activityEl.className = "activity" + (state ? " " + state : "");
         if (_activityTimer) {
           clearTimeout(_activityTimer);
@@ -295,6 +308,7 @@
           _activityTimer = setTimeout(() => {
             if (activityEl) activityEl.className = "activity";
             _activityTimer = null;
+            lastActivityState = null;
           }, 700);
         }
       }
@@ -627,6 +641,113 @@
         clearTimeout(resizeTO);
         resizeTO = setTimeout(() => drawChart(), 120);
       });
+    </script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+      // Map and geolocation tracking
+      (function () {
+        if (!window.L) return; // Leaflet not loaded
+
+        const mapEl = document.getElementById("map");
+        if (!mapEl) return;
+
+        const map = L.map("map", { zoomControl: true }).setView([0, 0], 2);
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          maxZoom: 19,
+          attribution:
+            '&copy; <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        }).addTo(map);
+
+        const trackLayer = L.layerGroup().addTo(map);
+        let lastPos = null;
+        let currentMarker = null;
+        let watchId = null;
+
+        function colorForState(state) {
+          switch (state) {
+            case "pending":
+              return "#4fd1c5"; // accent
+            case "success":
+              return "#4cf9b8"; // green
+            case "timeout":
+              return "#ffb56b"; // orange
+            case "error":
+              return "#ff6b6b"; // red
+            default:
+              return "#9aa6b2"; // muted/idle
+          }
+        }
+
+        function onPosition(pos) {
+          const latlng = [pos.coords.latitude, pos.coords.longitude];
+          const state = lastActivityState || null;
+          // draw segment from lastPos -> latlng with color representing the current activity
+          if (lastPos) {
+            const seg = L.polyline([lastPos, latlng], {
+              color: colorForState(state),
+              weight: 4,
+              opacity: 0.9,
+            }).addTo(trackLayer);
+          }
+          // update current marker
+          if (!currentMarker) {
+            currentMarker = L.circleMarker(latlng, {
+              radius: 6,
+              fillColor: colorForState(state),
+              color: "#000",
+              weight: 0.5,
+              fillOpacity: 0.95,
+            }).addTo(trackLayer);
+            map.setView(latlng, 14);
+          } else {
+            currentMarker.setLatLng(latlng);
+            currentMarker.setStyle({ fillColor: colorForState(state) });
+          }
+          lastPos = latlng;
+        }
+
+        function onPosError(err) {
+          // ignore; the map can remain static if location is unavailable
+          console.warn("Geolocation error", err && err.message);
+        }
+
+        // Start/stop watch tied to the pinging start/stop
+        const origStartClick = startBtn.onclick;
+        function startGeolocation() {
+          if (!navigator.geolocation) return;
+          if (watchId != null) return;
+          watchId = navigator.geolocation.watchPosition(
+            onPosition,
+            onPosError,
+            {
+              enableHighAccuracy: true,
+              maximumAge: 5000,
+              timeout: 10000,
+            }
+          );
+        }
+
+        function stopGeolocation() {
+          if (watchId != null && navigator.geolocation) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+          }
+        }
+
+        // Hook into the start button logic: when running starts, start geolocation; when stopped, stop it.
+        const orig = startBtn.onclick; // may be null; we also observe clicks below
+        startBtn.addEventListener("click", () => {
+          // determine running state by button text (Start vs Stop) and `running` flag
+          setTimeout(() => {
+            if (running) startGeolocation();
+            else stopGeolocation();
+          }, 50);
+        });
+
+        // Also start geolocation if ping loop started programmatically
+        const originalLoopPing = window.loopPing;
+        // no-op: we don't override loopPing here; start is handled by click listener above
+      })();
     </script>
     <script>
       // Register service worker for PWA (best-effort)
