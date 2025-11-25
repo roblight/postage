@@ -13,7 +13,21 @@ const PRECACHE = [
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const failed = [];
+      for (const url of PRECACHE) {
+        try {
+          await cache.add(url);
+        } catch (err) {
+          // Log which asset failed to fetch/cache but don't fail the install
+          console.warn("Precache failed for", url, err);
+          failed.push(url);
+        }
+      }
+      if (failed.length) {
+        console.warn("Some precache assets failed to cache:", failed);
+      }
+    })
   );
 });
 
