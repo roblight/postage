@@ -231,6 +231,9 @@
     const max = values.length ? Math.max(...values) : 1000;
     const min = values.length ? Math.min(...values) : 0;
     const range = Math.max(1, max - min);
+    const avg = values.length
+      ? values.reduce((a, b) => a + b, 0) / values.length
+      : null;
     const padding = 6;
     const plotW = cw - padding * 2;
     const plotH = ch - padding * 2 - 10;
@@ -251,6 +254,33 @@
     ns.ctx.strokeStyle = (ns.colors && ns.colors.accent) || "#4fd1c5";
     ns.ctx.lineWidth = 2;
     ns.ctx.stroke();
+
+    // Draw average line (across plotted area) if we have numeric values
+    if (avg !== null) {
+      let avgY = padding + (1 - (avg - min) / range) * plotH;
+      // clamp to plot area
+      avgY = Math.max(padding, Math.min(padding + plotH, avgY));
+      ns.ctx.save();
+      ns.ctx.beginPath();
+      ns.ctx.setLineDash([6, 4]);
+      ns.ctx.lineWidth = 1;
+      ns.ctx.strokeStyle =
+        (ns.colors && ns.colors.avgLine) || "rgba(255,255,255,0.6)";
+      ns.ctx.moveTo(padding, avgY);
+      ns.ctx.lineTo(padding + plotW, avgY);
+      ns.ctx.stroke();
+      ns.ctx.setLineDash([]);
+      // small label for average
+      ns.ctx.fillStyle =
+        (ns.colors && ns.colors.avgLine) || "rgba(255,255,255,0.9)";
+      ns.ctx.font =
+        "12px system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial";
+      const label = `${Math.round(avg)} ms`;
+      // position label slightly inside plot area, above the line when possible
+      const labelY = Math.max(12, avgY - 6);
+      ns.ctx.fillText(label, padding + 4, labelY);
+      ns.ctx.restore();
+    }
 
     for (let i = 0; i < samples.length; i++) {
       if (typeof samples[i] !== "number") {
