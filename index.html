@@ -88,6 +88,49 @@
         border: 1px solid rgba(255, 255, 255, 0.06);
         color: var(--muted);
       }
+      /* Ping activity indicator */
+      .activity {
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.06);
+        flex: 0 0 auto;
+        margin-left: 8px;
+        align-self: center;
+        transition: transform 150ms ease, background-color 150ms ease,
+          box-shadow 300ms ease;
+      }
+      .activity.pending {
+        background: var(--accent);
+        animation: pulse 1200ms infinite;
+        transform: scale(1.05);
+      }
+      .activity.success {
+        background: rgba(76, 249, 184, 0.95);
+        transform: scale(1.2);
+        box-shadow: 0 6px 18px rgba(76, 249, 184, 0.12);
+      }
+      .activity.timeout {
+        background: rgba(255, 181, 107, 0.95);
+        transform: scale(1.15);
+        box-shadow: 0 6px 18px rgba(255, 181, 107, 0.12);
+      }
+      .activity.error {
+        background: rgba(255, 107, 107, 0.95);
+        transform: scale(1.15);
+        box-shadow: 0 6px 18px rgba(255, 107, 107, 0.12);
+      }
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.35);
+        }
+        70% {
+          box-shadow: 0 0 0 10px rgba(79, 209, 197, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(79, 209, 197, 0);
+        }
+      }
       .stats {
         display: flex;
         gap: 8px;
@@ -164,6 +207,12 @@
           />
           <button id="start">Start</button>
           <button id="clear" class="secondary">Clear</button>
+          <div
+            id="activity"
+            class="activity"
+            aria-hidden="true"
+            title="Ping activity"
+          ></div>
         </div>
         <div class="stats" style="margin-top: 10px">
           <div class="stat">
@@ -230,6 +279,25 @@
       const connectionEl = document.getElementById("connection");
       const canvas = document.getElementById("chart");
       const ctx = canvas.getContext("2d");
+
+      // Activity indicator element and helper
+      const activityEl = document.getElementById("activity");
+      let _activityTimer = null;
+      function setActivity(state) {
+        if (!activityEl) return;
+        activityEl.className = "activity" + (state ? " " + state : "");
+        if (_activityTimer) {
+          clearTimeout(_activityTimer);
+          _activityTimer = null;
+        }
+        // For transient states, revert to idle after a short delay
+        if (state === "success" || state === "timeout" || state === "error") {
+          _activityTimer = setTimeout(() => {
+            if (activityEl) activityEl.className = "activity";
+            _activityTimer = null;
+          }, 700);
+        }
+      }
 
       let running = false;
       let timer = null;
@@ -507,8 +575,14 @@
       async function loopPing() {
         if (!running) return;
         updateConnectionInfo();
+        // indicate we're performing a ping
+        setActivity("pending");
         const res = await singlePing();
         addSample(res);
+        // show brief success / failure feedback
+        if (typeof res === "number") setActivity("success");
+        else if (res === "timeout") setActivity("timeout");
+        else setActivity("error");
         const interval = Math.max(100, Number(intervalEl.value) || 2000);
         timer = setTimeout(loopPing, interval);
       }
@@ -518,6 +592,7 @@
           running = false;
           startBtn.textContent = "Start";
           if (timer) clearTimeout(timer);
+          setActivity();
           return;
         }
         // start
