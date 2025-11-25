@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Postage Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        padding: 2rem;
+      }
+      input {
+        padding: 0.4rem;
+        margin-right: 0.5rem;
+      }
+      button {
+        padding: 0.45rem 0.75rem;
+        margin-right: 0.5rem;
+      }
+      #message {
+        margin-top: 1rem;
+        font-weight: 600;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Postage Demo</h1>
+    <p>
+      Type your name and press <strong>Greet</strong>, or press
+      <strong>Click me</strong> to increment a counter.
+    </p>
+    <input id="name" placeholder="Your name" />
+    <button id="greet">Greet</button>
+    <button id="count">Click me</button>
+    <p id="message"></p>
+
+    <script>
+      const nameInput = document.getElementById("name");
+      const msg = document.getElementById("message");
+      let clicks = 0;
+
+      document.getElementById("greet").addEventListener("click", () => {
+        const name = nameInput.value.trim() || "friend";
+        msg.textContent = `Hello, ${name}!`;
+      });
+
+      document.getElementById("count").addEventListener("click", () => {
+        clicks += 1;
+        msg.textContent = `Button clicked ${clicks} time${
+          clicks !== 1 ? "s" : ""
+        }.`;
+      });
+
+      // Small convenience: press Enter in the input to greet
+      nameInput.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") document.getElementById("greet").click();
+      });
+    </script>
+  </body>
+</html>
