@@ -36,19 +36,20 @@
       clearTimeout(_activityTimer);
       _activityTimer = null;
     }
+    const clearMs = (ns.config && ns.config.ACTIVITY_CLEAR_MS) || 700;
     if (state === "success" || state === "timeout" || state === "error") {
       _activityTimer = setTimeout(() => {
         if (ns.activityEl) ns.activityEl.className = "activity";
         _activityTimer = null;
         ns.lastActivityState = null;
-      }, 700);
+      }, clearMs);
     }
   };
 
   ns.running = false;
   let timer = null;
   ns.history = [];
-  const MAX_HISTORY = 120;
+  const MAX_HISTORY = (ns.config && ns.config.MAX_HISTORY) || 120;
 
   function getLocalIPs(timeout = 1000) {
     return new Promise((resolve) => {
@@ -178,7 +179,7 @@
       const min = Math.round(Math.min(...successes));
       const max = Math.round(Math.max(...successes));
       const avg = Math.round(
-        successes.reduce((a, b) => a + b, 0) / successes.length,
+        successes.reduce((a, b) => a + b, 0) / successes.length
       );
       ns.minEl.textContent = `${min} ms`;
       ns.maxEl.textContent = `${max} ms`;
@@ -247,7 +248,7 @@
         first = false;
       } else ns.ctx.lineTo(x, y);
     }
-    ns.ctx.strokeStyle = "#4fd1c5";
+    ns.ctx.strokeStyle = (ns.colors && ns.colors.accent) || "#4fd1c5";
     ns.ctx.lineWidth = 2;
     ns.ctx.stroke();
 
@@ -256,8 +257,12 @@
         const x = padding + i * step;
         const y = padding + plotH;
         const v = samples[i];
-        if (v === "timeout") ns.ctx.fillStyle = "rgba(255,181,107,0.95)";
-        else ns.ctx.fillStyle = "rgba(255,107,107,0.95)";
+        if (v === "timeout")
+          ns.ctx.fillStyle =
+            (ns.colors && ns.colors.timeoutMarker) || "rgba(255,181,107,0.95)";
+        else
+          ns.ctx.fillStyle =
+            (ns.colors && ns.colors.errorMarker) || "rgba(255,107,107,0.95)";
         ns.ctx.beginPath();
         ns.ctx.arc(x, y - 6, 4, 0, Math.PI * 2);
         ns.ctx.fill();
@@ -268,7 +273,12 @@
   async function singlePing() {
     const url = (ns.targetEl.value || "").trim();
     if (!url) return null;
-    const timeout = Math.max(50, Number(ns.timeoutEl.value) || 3000);
+    const timeout = Math.max(
+      50,
+      Number(ns.timeoutEl.value) ||
+        (ns.config && ns.config.DEFAULT_TIMEOUT) ||
+        3000
+    );
     try {
       const ms = await pingImage(url, timeout);
       return ms;
@@ -287,7 +297,12 @@
     if (typeof res === "number") ns.setActivity("success");
     else if (res === "timeout") ns.setActivity("timeout");
     else ns.setActivity("error");
-    const interval = Math.max(100, Number(ns.intervalEl.value) || 2000);
+    const interval = Math.max(
+      100,
+      Number(ns.intervalEl.value) ||
+        (ns.config && ns.config.DEFAULT_INTERVAL) ||
+        2000
+    );
     timer = setTimeout(loopPing, interval);
   }
 

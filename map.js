@@ -3,7 +3,7 @@
   const ns = window.postage || {};
   const mapEl = document.getElementById("map");
   if (!mapEl) return;
-  const MAP_ZOOM = 17;
+  const MAP_ZOOM = (ns.config && ns.config.MAP_ZOOM) || 17;
   try {
     window.MAP_ZOOM = MAP_ZOOM;
   } catch (e) {}
@@ -14,7 +14,7 @@
   }).setView([0, 0], 2);
   const tiles = L.tileLayer(
     "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-    { maxZoom: 19, attribution: "", attributionControl: false },
+    { maxZoom: 19, attribution: "", attributionControl: false }
   ).addTo(map);
 
   const LocateControl = L.Control.extend({
@@ -68,7 +68,7 @@
               console.warn("Geolocation error", err && err.message);
               btn.style.opacity = "1";
             },
-            { enableHighAccuracy: true, timeout: 10000 },
+            { enableHighAccuracy: true, timeout: 10000 }
           );
           return;
         }
@@ -83,7 +83,7 @@
             console.warn("Geolocation error", err && err.message);
             btn.style.opacity = "1";
           },
-          { enableHighAccuracy: true, timeout: 10000 },
+          { enableHighAccuracy: true, timeout: 10000 }
         );
       });
       return container;
@@ -103,17 +103,18 @@
   ns.watchId = null;
 
   function colorForState(state) {
+    const colors = ns.colors || {};
     switch (state) {
       case "pending":
-        return "#4fd1c5";
+        return colors.accent || "#4fd1c5";
       case "success":
-        return "#4cf9b8";
+        return colors.success || "#4cf9b8";
       case "timeout":
-        return "#ffb56b";
+        return colors.timeout || "#ffb56b";
       case "error":
-        return "#ff6b6b";
+        return colors.error || "#ff6b6b";
       default:
-        return "#9aa6b2";
+        return colors.muted || "#9aa6b2";
     }
   }
 
@@ -150,11 +151,16 @@
   function startGeolocation() {
     if (!navigator.geolocation) return;
     if (ns.watchId != null) return;
-    ns.watchId = navigator.geolocation.watchPosition(onPosition, onPosError, {
+    const opts = (ns.config && ns.config.GEO_WATCH) || {
       enableHighAccuracy: true,
       maximumAge: 5000,
       timeout: 10000,
-    });
+    };
+    ns.watchId = navigator.geolocation.watchPosition(
+      onPosition,
+      onPosError,
+      opts
+    );
   }
 
   function stopGeolocation() {
