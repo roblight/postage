@@ -189,6 +189,14 @@
             <div class="label">Loss</div>
             <div id="loss" class="value">— %</div>
           </div>
+          <div class="stat">
+            <div class="label">Timeouts</div>
+            <div id="timeouts" class="value">0</div>
+          </div>
+          <div class="stat">
+            <div class="label">Errors</div>
+            <div id="errors" class="value">0</div>
+          </div>
         </div>
       </div>
 
@@ -228,6 +236,8 @@
       const maxEl = document.getElementById("max");
       const jitterEl = document.getElementById("jitter");
       const lossEl = document.getElementById("loss");
+      const timeoutsEl = document.getElementById("timeouts");
+      const errorsEl = document.getElementById("errors");
       const samplesEl = document.getElementById("samples");
       const connectionEl = document.getElementById("connection");
       const canvas = document.getElementById("chart");
@@ -299,6 +309,9 @@
         const successes = history.filter((v) => typeof v === "number");
         const failures = attempts - successes.length;
 
+        const timeouts = history.filter((v) => v === "timeout").length;
+        const errors = history.filter((v) => v === "error").length;
+
         samplesEl.textContent = `Samples: ${attempts}`;
         lastEl.textContent = successes.length
           ? `${Math.round(successes[successes.length - 1])} ms`
@@ -330,6 +343,8 @@
 
         const loss = attempts ? Math.round((failures / attempts) * 100) : 0;
         lossEl.textContent = `${loss} %`;
+        timeoutsEl.textContent = `${timeouts}`;
+        errorsEl.textContent = `${errors}`;
       }
 
       function drawChart() {
@@ -373,12 +388,15 @@
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // draw failure markers
+        // draw failure markers (timeout vs error)
         for (let i = 0; i < samples.length; i++) {
           if (typeof samples[i] !== "number") {
             const x = padding + i * step;
             const y = padding + plotH;
-            ctx.fillStyle = "rgba(255,107,107,0.9)";
+            const v = samples[i];
+            // timeout: orange-ish, error: red
+            if (v === "timeout") ctx.fillStyle = "rgba(255,181,107,0.95)";
+            else ctx.fillStyle = "rgba(255,107,107,0.95)";
             ctx.beginPath();
             ctx.arc(x, y - 6, 4, 0, Math.PI * 2);
             ctx.fill();
@@ -404,7 +422,9 @@
           const ms = await pingImage(url, timeout);
           return ms;
         } catch (e) {
-          return null; // treat as failure
+          // return a typed failure so UI can distinguish timeouts vs other errors
+          if (e && e.message === "timeout") return "timeout";
+          return "error"; // treat other errors as generic errors
         }
       }
 
