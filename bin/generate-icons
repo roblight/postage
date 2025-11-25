@@ -1,0 +1,54 @@
+#!/usr/bin/env python3
+"""
+Generate PNG icon variants from the existing SVG icons.
+
+Requires: cairosvg
+
+Usage:
+  python3 scripts/generate_icons.py
+
+This will read `icons/icon-192.svg` and `icons/icon-512.svg` and write
+`icons/icon-192.png` and `icons/icon-512.png` in the same directory.
+"""
+import os
+from pathlib import Path
+
+try:
+    import cairosvg
+except Exception as e:
+    print("Missing dependency: cairosvg. Install with: pip install cairosvg")
+    raise
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ICONS_DIR = ROOT / "icons"
+
+SVG_192 = ICONS_DIR / "icon-192.svg"
+SVG_512 = ICONS_DIR / "icon-512.svg"
+PNG_192 = ICONS_DIR / "icon-192.png"
+PNG_512 = ICONS_DIR / "icon-512.png"
+
+
+def convert(svg_path: Path, png_path: Path, size: int):
+    if not svg_path.exists():
+        print(f"SVG not found: {svg_path}")
+        return False
+    print(f"Converting {svg_path.name} -> {png_path.name} ({size}x{size})")
+    cairosvg.svg2png(
+        url=str(svg_path), write_to=str(png_path), output_width=size, output_height=size
+    )
+    return True
+
+
+def main():
+    ICONS_DIR.mkdir(parents=True, exist_ok=True)
+    ok1 = convert(SVG_192, PNG_192, 192)
+    ok2 = convert(SVG_512, PNG_512, 512)
+    if ok1 or ok2:
+        print("Done. Generated PNGs are in icons/")
+    else:
+        print("No files generated.")
+
+
+if __name__ == "__main__":
+    main()

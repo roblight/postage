@@ -4,6 +4,10 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Mobile Latency Monitor</title>
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#071025" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <style>
       :root {
         --bg: #0f1720;
@@ -554,6 +558,19 @@
         clearTimeout(resizeTO);
         resizeTO = setTimeout(() => drawChart(), 120);
       });
+    </script>
+    <script>
+      // Register service worker for PWA (best-effort)
+      if ("serviceWorker" in navigator) {
+        window.addEventListener("load", () => {
+          navigator.serviceWorker
+            .register("/sw.js")
+            .then((reg) => {
+              console.log("Service worker registered", reg);
+            })
+            .catch((err) => console.warn("SW registration failed", err));
+        });
+      }
     </script>
   </body>
 </html>
