@@ -1,0 +1,180 @@
+/* Extracted styles from index.html */
+/* Ensure any Leaflet attribution control is hidden if present */
+.leaflet-control-attribution {
+  display: none !important;
+}
+:root {
+  --bg: #0f1720;
+  --card: #0b1220;
+  --accent: #4fd1c5;
+  --muted: #9aa6b2;
+  --danger: #ff6b6b;
+}
+html,
+body {
+  min-height: 100vh;
+  margin: 0;
+}
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+  background: linear-gradient(180deg, #071025 0%, #071826 100%);
+  color: #e6eef6;
+  padding: 16px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.container {
+  max-width: 820px;
+  margin: 0 auto;
+  width: 100%;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+h1 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+.card {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  box-shadow: 0 6px 18px rgba(2, 6, 23, 0.6);
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+input[type="text"],
+input[type="number"],
+select {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: inherit;
+  padding: 8px;
+  border-radius: 8px;
+  width: 100%;
+  min-width: 140px;
+}
+.controls > * {
+  flex: 1;
+}
+.small {
+  flex: 0 0 120px;
+}
+button {
+  background: var(--accent);
+  color: #042026;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-weight: 600;
+}
+button.secondary {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
+.activity {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  flex: 0 0 auto;
+  margin-left: 8px;
+  align-self: center;
+  transition:
+    transform 150ms ease,
+    background-color 150ms ease,
+    box-shadow 300ms ease;
+}
+.activity.pending {
+  background: var(--accent);
+  animation: pulse 1200ms infinite;
+  transform: scale(1.05);
+}
+.activity.success {
+  background: rgba(76, 249, 184, 0.95);
+  transform: scale(1.2);
+  box-shadow: 0 6px 18px rgba(76, 249, 184, 0.12);
+}
+.activity.timeout {
+  background: rgba(255, 181, 107, 0.95);
+  transform: scale(1.15);
+  box-shadow: 0 6px 18px rgba(255, 181, 107, 0.12);
+}
+.activity.error {
+  background: rgba(255, 107, 107, 0.95);
+  transform: scale(1.15);
+  box-shadow: 0 6px 18px rgba(255, 107, 107, 0.12);
+}
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(79, 209, 197, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(79, 209, 197, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(79, 209, 197, 0);
+  }
+}
+.stats {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.stat {
+  flex: 1 1 120px;
+  background: rgba(255, 255, 255, 0.02);
+  padding: 8px;
+  border-radius: 8px;
+  text-align: center;
+}
+.stat .label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+.stat .value {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+canvas {
+  width: 100%;
+  height: 120px;
+  border-radius: 8px;
+  display: block;
+}
+footer {
+  margin-top: auto;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 8px;
+}
+#connection {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1;
+}
+@media (max-width: 520px) {
+  .controls {
+    flex-direction: column;
+  }
+  .small {
+    flex: 1;
+  }
+}
