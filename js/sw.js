@@ -3,7 +3,7 @@ const CACHE_NAME = "postage-pwa-v1";
 const PRECACHE = [
   "/",
   "/index.html",
-  "/js/manifest.json",
+  "js/manifest.json",
   "/icons/icon-192.svg",
   "/icons/icon-512.svg",
 ];
