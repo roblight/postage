@@ -4,10 +4,10 @@ const PRECACHE = [
   "/",
   "/index.html",
   "/js/manifest.json",
-  "/icons/icon-192.png",
-  "/icons/icon-512.png",
-  "/icons/icon-192.svg",
-  "/icons/icon-512.svg",
+  "../icons/icon-192.png",
+  "../icons/icon-512.png",
+  "../icons/icon-192.svg",
+  "../icons/icon-512.svg",
 ];
 
 self.addEventListener("install", (event) => {
