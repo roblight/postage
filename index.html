@@ -268,13 +268,17 @@
 
       <div class="card">
         <canvas id="chart" width="800" height="120"></canvas>
-        <div
-          style="display: flex; justify-content: space-between; margin-top: 8px"
-        >
-          <div id="connection">🌐 &nbsp;</div>
-        </div>
       </div>
       <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+          "
+        >
+          <div id="connection">🌐</div>
+        </div>
         <div id="map" style="height: 240px; border-radius: 8px"></div>
       </div>
     </div>
@@ -399,19 +403,7 @@
 
       // Update the connection UI with effectiveType/downlink + local/public info.
       async function updateConnectionInfo() {
-        const parts = [];
-        // const nav = navigator;
-        // const conn =
-        //   nav.connection || nav.mozConnection || nav.webkitConnection;
-        // if (conn && conn.effectiveType) {
-        //   const downlink = Number.isFinite(conn.downlink)
-        //     ? conn.downlink.toFixed(1)
-        //     : "—";
-        //   parts.push(`Connection: ${conn.effectiveType} (${downlink} Mbps)`);
-        // } else {
-        //   parts.push(`Connection: 🤷`);
-        // }
-
+        const parts = ["🌐 "];
         // Add local IPs (best-effort; may be empty or suppressed by the browser)
         try {
           const local = await getLocalIPs();
@@ -424,11 +416,11 @@
           if (publicIp) {
             const host = await reverseDNS(publicIp);
             if (host) parts.push(host);
-            else parts.push(`Public IP: ${publicIp}`);
+            else parts.push(publicIp);
           }
         } catch (e) {}
 
-        connectionEl.textContent += parts.join(" • ");
+        connectionEl.textContent = parts.join(" ");
       }
 
       // Ping using fetch + AbortController for reliable timing and timeouts.
